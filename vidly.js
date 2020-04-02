@@ -1,8 +1,12 @@
+const mongoose = require("mongoose");
 const express = require("express");
-const Joi = require("joi");
 const logger = require("./logger");
 const genres = require("./routes/genres")
 const app = express();
+
+mongoose.connect('mongodb://localhost/vidly')
+    .then( () => console.log("We're in."))
+    .catch( (err) => console.error('oops... db?'));
 
 app.use(express.json());
 app.use(logger);

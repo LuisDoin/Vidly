@@ -1,17 +1,5 @@
-const mongoose = require("mongoose");
 const express = require("express");
-const Joi = require("joi");
-
-const genreSchema = mongoose.Schema({
-
-    genre: { type: String, 
-             required: true,
-             minlength: 3,
-             maxlength: 50
-    }             
-});
-
-const Genre = mongoose.model("Genre", genreSchema);
+const {Genre, validate} = require('../models/genre');
 
 const router = express.Router();
 
@@ -90,12 +78,5 @@ router.delete("/:id", async (req, res) => {
         send.status(400).send(err.message);    
     } 
 });
-
-function validate(genre){
-
-    const schema = { genre: Joi.string().required()  };
-
-    return Joi.validate(genre, schema);
-}
 
 module.exports = router;

@@ -1,29 +1,6 @@
-const mongoose = require('mongoose');
 const express = require('express');
-const Joi = require('joi');
-
-
-const costumerSchema = {
-
-    
-    isGold: {
-        type: Boolean,
-        default: false
-    },
-    name: { 
-        type: String,
-        required: true
-    },
-    phone: {
-        type: String,
-        required: true,
-        validate: /^[0-9]{9}$/
-    }
-}
-
-const Costumer = mongoose.model("Costumer", costumerSchema);
-
 const router = express.Router();
+const {Costumer, validate} = require('../models/costumer');
 
 router.get("", async (req, res) => {
 
@@ -69,7 +46,6 @@ router.post("", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
 
-    //Validar com Joi.
     const { error } = validate(req.body);
 
     if( error ) return res.status(400).send(error.details[0].message);
@@ -89,24 +65,17 @@ router.put("/:id", async (req, res) => {
 
 router.delete("/:id", async (req, res ) => {
 
-    
+    try {
+        
         const costumer = await Costumer.findByIdAndDelete(req.params.id);
 
         if( !costumer ) return res.status(404).send("Costumer not found.");
 
         res.send( costumer ); 
-});
-
-function validate(costumer){
-
-    const schema = { 
-        
-        isGold: Joi.boolean(),
-        name: Joi.string().required(),
-        phone: Joi.string().required().regex(/^[1-9]{9}$/)
+    } 
+    catch(err) {
+        res.status(404).send(err.message);
     }
-
-    return Joi.validate(costumer, schema);
-}
+});
 
 module.exports = router;

@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const {Costumer, validate} = require('../models/costumer');
+const {Customer, validate} = require('../models/customer');
 
 router.get("", async (req, res) => {
 
     try{
-        const costumer = await Costumer.find();
-        res.send(costumer);
+        const customer = await Customer.find();
+        res.send(customer);
     }
     catch(err) {
         res.status(400).send(err.message);
@@ -16,7 +16,7 @@ router.get("", async (req, res) => {
 router.get("/:id", async (req, res) => {
 
     try{
-        const costumer = await Costumer.findById(req.params.id)
+        const costumer = await Customer.findById(req.params.id)
 
         if( !costumer ) return res.status(404).send("costumer not found.");
 
@@ -33,11 +33,11 @@ router.post("", async (req, res) => {
 
     if( error ) return res.status(400).send(error.details[0].message);
     
-    let costumer = new Costumer(req.body);
+    let customer = new Customer(req.body);
 
     try {
-        costumer = await costumer.save()
-        res.send(costumer);
+        customer = await customer.save();
+        res.send(customer);
     } 
     catch(err) {
         res.status(400).send(err.message);
@@ -51,12 +51,15 @@ router.put("/:id", async (req, res) => {
     if( error ) return res.status(400).send(error.details[0].message);
     
     try {
-        let costumer = await Costumer.findById(req.params.id);
+        let customer = await Customer.findById(req.params.id);
         
-        if( !costumer ) return res.status(404).send("Costumer not found.")
+        if( !customer ) return res.status(404).send("Customer not found.")
 
-        costumer = new Costumer(req.body);
-        res.send( await costumer.save() );
+        customer.isGold = req.body.isGold;
+        customer.name = req.body.name;
+        customer.phone = req.body.phone;
+
+        res.send( await customer.save() );
     } 
     catch(err) {
         res.status(400).send(err.message);
@@ -67,11 +70,11 @@ router.delete("/:id", async (req, res ) => {
 
     try {
         
-        const costumer = await Costumer.findByIdAndDelete(req.params.id);
+        const customer = await Customer.findByIdAndDelete(req.params.id);
 
-        if( !costumer ) return res.status(404).send("Costumer not found.");
+        if( !customer ) return res.status(404).send("Customer not found.");
 
-        res.send( costumer ); 
+        res.send(customer); 
     } 
     catch(err) {
         res.status(404).send(err.message);

@@ -6,7 +6,8 @@ const movies = require("./routes/movies");
 const rentals = require("./routes/rentals");
 const app = express();
 
-mongoose.connect('mongodb://localhost/vidly')
+const dbUri = 'mongodb://LAPTOP-LGQ90SB4:27017,LAPTOP-LGQ90SB4:27018,LAPTOP-LGQ90SB4:27019/vidly';
+mongoose.connect(dbUri, { replicaSet: 'rs' })
     .then( () => console.log("We're in."))
     .catch( (err) => console.error(err.message));
 

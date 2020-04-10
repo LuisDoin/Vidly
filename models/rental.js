@@ -7,7 +7,8 @@ const Rental = mongoose.model('Rental', new mongoose.Schema({
         type: new mongoose.Schema({
             name: {
                 type: String,
-                required: true
+                required: true,
+                index: true
             },
             isGold: {
                 type: Boolean,

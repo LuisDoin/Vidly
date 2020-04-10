@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const {Rental, validate} = require('../models/rental');
 const {Movie} = require('../models/movie');
 const {Customer} = require('../models/customer');
@@ -21,10 +22,14 @@ router.post("/", async (req, res) => {
 
     if( error ) return res.status(400).send(error.details[0].message);
 
+    const session = await mongoose.startSession();
+            
+    session.startTransaction();
+
     try {
+        
         const customer = await Customer.findById(req.body.customerId);
 
-        
         if( !customer ) return res.status(404).send("Invalid customer.");
         
         const movie = await Movie.findById(req.body.movieId);
@@ -33,8 +38,7 @@ router.post("/", async (req, res) => {
 
         if( movie.numberInStock === 0 ) return res.status(400).send("Movie not available in stock.");
 
-        
-        let rental = new Rental({
+        const [rental] = await Rental.create([{
 
             customer: {
                 _id: customer._id,
@@ -45,34 +49,38 @@ router.post("/", async (req, res) => {
             movie: {
                 _id: movie._id,
                 title: movie.title,
-                dailyRentalRate: movie.dailyRentalRate
+                dailyRentalRate: movie.dailyRentalRate | "undefined"
             }
 
-        })
+        }], {session} );
 
-        
-        rental = await rental.save();
-
-        movie.numberInStock--;
-        movie.save();
+        await Movie.updateOne( { _id: movie._id }, 
+            { $set: { numberInStock: movie.numberInStock - 1 } },  
+            { runValidators: true} )
+            .session(session);
+           
+        await session.commitTransaction();
 
         res.send(rental);
 
     } 
     catch(err) {
-        res.status(400).send(err.message);
+
+        await session.abortTransaction(); 
+        res.status(500).send(err.message);
     }
+    finally{ session.endSession(); }
 });
 
 router.delete('/:id', async (req, res) => {
 
-    const rental = Rental.findByIdAndDelete(req.params.id);
-
-    if( !rental ) return res.status(404).send("Rental not found.");
-
-    if( !rental.movie.dateReturned ){
+    const rental = await Rental.findByIdAndDelete(req.params.id);
     
-        let movie = Movie.findById(rental.movie.movieId);
+    if( !rental ) return res.status(404).send("Rental not found.");
+    
+    if( !(rental.movie.dateReturned) ){
+    
+        let movie = await Movie.findById(rental.movie._id);
 
         movie.numberInStock++;
         movie.save();

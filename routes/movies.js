@@ -44,8 +44,9 @@ router.post("/", async (req, res) => {
             _id: genre._id
         }
 
-        let movie = new Movie(req.body);
-        movie = await movie.save();
+        const movie = new Movie(req.body);
+        await movie.save();
+        
         res.send( movie );
     } 
     catch(err) {

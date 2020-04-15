@@ -29,14 +29,16 @@ router.get("/:id", async (req, res) => {
 
 router.post("", async (req, res) => {
 
-    const { error } = validate(req.body);
-
-    if( error ) return res.status(400).send(error.details[0].message);
-    
-    let customer = new Customer(req.body);
-
     try {
-        customer = await customer.save();
+    
+        const { error } = validate(req.body);
+
+        if( error ) return res.status(400).send(error.details[0].message);
+    
+        const customer = new Customer(req.body);
+
+        await customer.save();
+        
         res.send(customer);
     } 
     catch(err) {

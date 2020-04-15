@@ -7,7 +7,7 @@ const router = express.Router();
 router.get("/", async (req, res) => {
 
     try {
-        res.send( await Movie.find() )
+        res.send( await Movie.find() );
     } 
     catch(err) {
         res.status(400).send(err.message);

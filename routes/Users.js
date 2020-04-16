@@ -1,3 +1,5 @@
+const admin = require("../midleware/admin");
+const auth = require('../midleware/auth');
 const express = require('express');
 const {User, validate} = require('../models/user');
 const _ = require('lodash');
@@ -5,13 +7,19 @@ const bcrypt = require('bcrypt');
 
 const router = express.Router();
 
+router.get("/me", auth, async (req, res) => {
+
+    const user = await User.findById(req.user._id).select("-password");
+    res.send(user);
+})
+
 router.get("/", async (req, res) => {
 
     try {
         res.send( await User.find() );
     }
-    catch(err) {
-        res.status(400).send(err.message);
+    catch(e) {
+        res.status(400).send(e.message);
     }
 })
 
@@ -25,12 +33,12 @@ router.get("/:id", async (req, res) => {
 
         res.send(user);
     } 
-    catch(err) {
-        res.status(400).send(err.message);
+    catch(e) {
+        res.status(400).send(e.message);
     }
 })
 
-router.post("/", async (req,res) => {
+router.post("/", auth, async (req,res) => {
 
     try {
         
@@ -54,13 +62,13 @@ router.post("/", async (req,res) => {
         res.header('x-auth-token', token).send( _.pick(user, ["_id", "name", "email"]) );
 
     } 
-    catch(err) {
-        res.status(400).send(err.message);
+    catch(e) {
+        res.status(400).send(e.message);
     }
     
 })
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", auth, async (req, res) => {
 
     try {
         
@@ -80,12 +88,12 @@ router.put("/:id", async (req, res) => {
         
         res.send( user );
     } 
-    catch(err) {
-        res.status(400).send(err.message)
+    catch(e) {
+        res.status(400).send(e.message)
     }
 })
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", [auth, admin], async (req, res) => {
 
     try {
         
@@ -95,8 +103,8 @@ router.delete("/:id", async (req, res) => {
 
         res.send(user);
     } 
-    catch(err) {
-        res.status(400).send(err.message);
+    catch(e) {
+        res.status(400).send(e.message);
     }
 })
 

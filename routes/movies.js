@@ -1,3 +1,5 @@
+const admin = require("../midleware/admin");
+const auth = require('../midleware/auth');
 const express = require('express');
 const {Movie, validate} = require("../models/movie");
 const {Genre} = require("../models/genre");
@@ -9,8 +11,8 @@ router.get("/", async (req, res) => {
     try {
         res.send( await Movie.find() );
     } 
-    catch(err) {
-        res.status(400).send(err.message);
+    catch(e) {
+        res.status(400).send(e.message);
     }
 })
 
@@ -23,12 +25,12 @@ router.get("/:id", async (req, res) => {
 
         res.send(movie);
     } 
-    catch(err) {
-        res.status(400).send(err.message);
+    catch(e) {
+        res.status(400).send(e.message);
     }
 })
 
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req, res) => {
 
     let { error } = validate(req.body);
 
@@ -49,12 +51,12 @@ router.post("/", async (req, res) => {
         
         res.send( movie );
     } 
-    catch(err) {
-        res.status(400).send(err.message);
+    catch(e) {
+        res.status(400).send(e.message);
     }
 })
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", auth, async (req, res) => {
 
     const { error } = validate(req.body);
 
@@ -80,12 +82,12 @@ router.put("/:id", async (req, res) => {
         
         res.send( await movie.save() );
     } 
-    catch(err){
-        res.status(400).send(err.message);
+    catch(e){
+        res.status(400).send(e.message);
     }
 })
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", [auth, admin], async (req, res) => {
 
     try {
         const movie = Movie.findByIdAndDelete(req.params.id);
@@ -94,8 +96,8 @@ router.delete("/:id", async (req, res) => {
 
         res.send(movie);
     } 
-    catch(err) {
-        res.status(400).send(err.message);
+    catch(e) {
+        res.status(400).send(e.message);
     }
 })
 

@@ -1,3 +1,5 @@
+const admin = require("../midleware/admin");
+const auth = require('../midleware/auth');
 const express = require('express');
 const mongoose = require('mongoose');
 const {Rental, validate} = require('../models/rental');
@@ -11,12 +13,12 @@ router.get("/", async (req, res) => {
     try {
         res.send( await Rental.find().sort("-dateOut") );
     } 
-    catch(err) {
-        res.status(400).send(err.message)
+    catch(e) {
+        res.status(400).send(e.message)
     }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req, res) => {
 
     const {error} = validate(req.body);
 
@@ -64,29 +66,34 @@ router.post("/", async (req, res) => {
         res.send(rental);
 
     } 
-    catch(err) {
+    catch(e) {
 
         await session.abortTransaction(); 
-        res.status(500).send(err.message);
+        res.status(500).send(e.message);
     }
     finally{ session.endSession(); }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', [auth, admin], async (req, res) => {
 
     const rental = await Rental.findByIdAndDelete(req.params.id);
     
-    if( !rental ) return res.status(404).send("Rental not found.");
-    
-    if( !(rental.movie.dateReturned) ){
-    
-        let movie = await Movie.findById(rental.movie._id);
+    try {
+        if( !rental ) return res.status(404).send("Rental not found.");
+        
+            if( !(rental.movie.dateReturned) ){
+        
+            let movie = await Movie.findById(rental.movie._id);
 
-        movie.numberInStock++;
-        movie.save();
+            movie.numberInStock++;
+            movie.save();
+        }
+
+        res.send(rental);
     }
-
-    res.send(rental);
+    catch(e) {
+        res.status(400).send(e.message)
+    }
 })
 
 module.exports = router;

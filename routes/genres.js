@@ -1,3 +1,5 @@
+const admin = require("../midleware/admin");
+const auth = require('../midleware/auth');
 const express = require("express");
 const {Genre, validate} = require('../models/genre');
 
@@ -8,8 +10,8 @@ router.get("", async (req, res) => {
     try {
         res.send( await Genre.find() );
     } 
-    catch(err) {
-        res.status(400).send(err.message);
+    catch(e) {
+        res.status(400).send(e.message);
     } 
 });
 
@@ -22,12 +24,12 @@ router.get("/:id", async (req, res) => {
 
         res.send(genre);
     } 
-    catch(err) {
-        res.status(400).send(err.message);
+    catch(e) {
+        res.status(400).send(e.message);
     }
 });
 
-router.post("", async (req, res) => {
+router.post("/", auth,  async (req, res) => {
 
     const { error } = validate(req.body);
     
@@ -38,12 +40,12 @@ router.post("", async (req, res) => {
     try {
         res.send(await genre.save());
     } 
-    catch(err) {
-        res.status(400).send(err.message);
+    catch(e) {
+        res.status(400).send(e.message);
     } 
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", auth, async (req, res) => {
 
     const { error } = validate(req.body);
     
@@ -59,13 +61,13 @@ router.put("/:id", async (req, res) => {
 
         res.send(await genre.save());
     } 
-    catch(err) {
-        res.status(400).send(err.message);
+    catch(e) {
+        res.status(400).send(e.message);
     }
     
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", [auth, admin], async (req, res) => {
    
     try {
         const genre = await Genre.findByIdAndDelete(req.params.id);
@@ -74,8 +76,8 @@ router.delete("/:id", async (req, res) => {
 
     res.send(genre);
     } 
-    catch(err) {
-        send.status(400).send(err.message);    
+    catch(e) {
+        send.status(400).send(e.message);    
     } 
 });
 

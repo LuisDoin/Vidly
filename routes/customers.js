@@ -1,3 +1,5 @@
+const admin = require("../midleware/admin");
+const auth = require('../midleware/auth');
 const express = require('express');
 const router = express.Router();
 const {Customer, validate} = require('../models/customer');
@@ -8,8 +10,8 @@ router.get("", async (req, res) => {
         const customer = await Customer.find();
         res.send(customer);
     }
-    catch(err) {
-        res.status(400).send(err.message);
+    catch(e) {
+        res.status(400).send(e.message);
     } 
 });
 
@@ -22,12 +24,12 @@ router.get("/:id", async (req, res) => {
 
         res.send(costumer);   
     }
-    catch(err) {
-        res.status(400).send(err.message);
+    catch(e) {
+        res.status(400).send(e.message);
     }
 });
 
-router.post("", async (req, res) => {
+router.post("/", auth, async (req, res) => {
 
     try {
     
@@ -41,12 +43,12 @@ router.post("", async (req, res) => {
         
         res.send(customer);
     } 
-    catch(err) {
-        res.status(400).send(err.message);
+    catch(e) {
+        res.status(400).send(e.message);
     }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", auth, async (req, res) => {
 
     const { error } = validate(req.body);
 
@@ -63,12 +65,12 @@ router.put("/:id", async (req, res) => {
 
         res.send( await customer.save() );
     } 
-    catch(err) {
-        res.status(400).send(err.message);
+    catch(e) {
+        res.status(400).send(e.message);
     }
 });
 
-router.delete("/:id", async (req, res ) => {
+router.delete("/:id", [auth, admin], async (req, res ) => {
 
     try {
         
@@ -78,8 +80,8 @@ router.delete("/:id", async (req, res ) => {
 
         res.send(customer); 
     } 
-    catch(err) {
-        res.status(404).send(err.message);
+    catch(e) {
+        res.status(404).send(e.message);
     }
 });
 

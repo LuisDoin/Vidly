@@ -1,4 +1,3 @@
-const asyncMiddleware = require('../middleware/async');
 const admin = require("../middleware/admin");
 const auth = require('../middleware/auth');
 const express = require('express');
@@ -8,18 +7,18 @@ const bcrypt = require('bcrypt');
 
 const router = express.Router();
 
-router.get("/me", auth, asyncMiddleware( async (req, res) => {
+router.get("/me", auth, async (req, res) => {
     
     const user = await User.findById(req.user._id).select("-password");
     res.send(user);
     
-}));
+});
 
-router.get("/", asyncMiddleware( async (req, res) => {
+router.get("/", async (req, res) => {
     res.send( await User.find() );
-}));
+});
 
-router.get("/:id", asyncMiddleware( async (req, res) => {
+router.get("/:id", async (req, res) => {
     
     const user = await User.findById(req.params.id);
     
@@ -27,9 +26,9 @@ router.get("/:id", asyncMiddleware( async (req, res) => {
     
     res.send(user);
     
-}));
+});
 
-router.post("/", auth, asyncMiddleware( async (req,res) => {
+router.post("/", auth, async (req,res) => {
     
     const {error} = validate(req.body);
     
@@ -50,9 +49,9 @@ router.post("/", auth, asyncMiddleware( async (req,res) => {
     
     res.header('x-auth-token', token).send( _.pick(user, ["_id", "name", "email"]) );
     
-}));
+});
 
-router.put("/:id", auth, asyncMiddleware( async (req, res) => {
+router.put("/:id", auth, async (req, res) => {
     
     let user = await User.findById(req.params.id);
     
@@ -70,9 +69,9 @@ router.put("/:id", auth, asyncMiddleware( async (req, res) => {
     
     res.send( user );
     
-}));
+});
 
-router.delete("/:id", [auth, admin], asyncMiddleware( async (req, res) => {
+router.delete("/:id", [auth, admin], async (req, res) => {
     
     const user = await User.findByIdAndDelete(req.params.id);
     
@@ -80,6 +79,6 @@ router.delete("/:id", [auth, admin], asyncMiddleware( async (req, res) => {
     
     res.send(user);
     
-}));
+});
 
 module.exports = router;

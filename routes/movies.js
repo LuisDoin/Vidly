@@ -1,4 +1,4 @@
-const asyncMiddleware = require('../middleware/async');
+const asyncMiddleware = require('../middleware/async'); //used for pedagogic reasons.
 const admin = require("../middleware/admin");
 const auth = require('../middleware/auth');
 const express = require('express');

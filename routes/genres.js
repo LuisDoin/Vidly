@@ -1,4 +1,3 @@
-const asyncMiddleware = require('../middleware/async');
 const admin = require("../middleware/admin");
 const auth = require('../middleware/auth');
 const express = require("express");
@@ -6,11 +5,12 @@ const {Genre, validate} = require('../models/genre');
 
 const router = express.Router();
 
-router.get("", asyncMiddleware( async (req, res) => {
+router.get("", async (req, res) => {
+    throw new Error('teste');
     res.send( await Genre.find() );
-}));
+});
 
-router.get("/:id", asyncMiddleware( async (req, res) => {
+router.get("/:id", async (req, res) => {
     
     const genre = await Genre.findById(req.params.id);
     
@@ -18,9 +18,9 @@ router.get("/:id", asyncMiddleware( async (req, res) => {
     
     res.send(genre);
     
-}));
+});
 
-router.post("/", auth,  asyncMiddleware( async (req, res) => {
+router.post("/", auth,  async (req, res) => {
     
     const { error } = validate(req.body);
     
@@ -30,9 +30,9 @@ router.post("/", auth,  asyncMiddleware( async (req, res) => {
     
     res.send(await genre.save());
     
-}));
+});
 
-router.put("/:id", auth, asyncMiddleware( async (req, res) => {
+router.put("/:id", auth, async (req, res) => {
     
     const { error } = validate(req.body);
     
@@ -46,9 +46,9 @@ router.put("/:id", auth, asyncMiddleware( async (req, res) => {
     
     res.send(await genre.save());
     
-}));
+});
 
-router.delete("/:id", [auth, admin], asyncMiddleware( async (req, res) => {
+router.delete("/:id", [auth, admin], async (req, res) => {
     
     const genre = await Genre.findByIdAndDelete(req.params.id);
     
@@ -56,6 +56,6 @@ router.delete("/:id", [auth, admin], asyncMiddleware( async (req, res) => {
     
     res.send(genre); 
     
-}));
+});
 
 module.exports = router;

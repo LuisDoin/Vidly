@@ -1,3 +1,4 @@
+const validateObjectId = require('../middleware/validateObjectId');
 const admin = require("../middleware/admin");
 const auth = require('../middleware/auth');
 const express = require('express');
@@ -18,7 +19,7 @@ router.get("/", async (req, res) => {
     res.send( await User.find() );
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", validateObjectId, async (req, res) => {
     
     const user = await User.findById(req.params.id);
     
@@ -51,7 +52,7 @@ router.post("/", auth, async (req,res) => {
     
 });
 
-router.put("/:id", auth, async (req, res) => {
+router.put("/:id", [auth, validateObjectId], async (req, res) => {
     
     let user = await User.findById(req.params.id);
     
@@ -71,7 +72,7 @@ router.put("/:id", auth, async (req, res) => {
     
 });
 
-router.delete("/:id", [auth, admin], async (req, res) => {
+router.delete("/:id", [auth, admin, validateObjectId], async (req, res) => {
     
     const user = await User.findByIdAndDelete(req.params.id);
     

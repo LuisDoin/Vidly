@@ -1,3 +1,4 @@
+const validateObjectId = require('../middleware/validateObjectId');
 const admin = require("../middleware/admin");
 const auth = require('../middleware/auth');
 const express = require("express");
@@ -6,11 +7,10 @@ const {Genre, validate} = require('../models/genre');
 const router = express.Router();
 
 router.get("", async (req, res) => {
-    throw new Error('teste');
     res.send( await Genre.find() );
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", validateObjectId, async (req, res) => {
     
     const genre = await Genre.findById(req.params.id);
     
@@ -28,11 +28,13 @@ router.post("/", auth,  async (req, res) => {
     
     let genre = new Genre({ genre : req.body.genre });
     
-    res.send(await genre.save());
+    genre = await genre.save();
+    
+    res.send(genre);
     
 });
 
-router.put("/:id", auth, async (req, res) => {
+router.put("/:id", [auth, validateObjectId] , async (req, res) => {
     
     const { error } = validate(req.body);
     
@@ -48,7 +50,7 @@ router.put("/:id", auth, async (req, res) => {
     
 });
 
-router.delete("/:id", [auth, admin], async (req, res) => {
+router.delete("/:id", [auth, admin, validateObjectId], async (req, res) => {
     
     const genre = await Genre.findByIdAndDelete(req.params.id);
     

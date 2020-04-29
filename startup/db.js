@@ -1,9 +1,10 @@
 const mongoose = require("mongoose");
+const config = require("config");
 
 module.exports = function(){
     
-    const dbUri = 'mongodb://LAPTOP-LGQ90SB4:27017,LAPTOP-LGQ90SB4:27018,LAPTOP-LGQ90SB4:27019/vidly';
+    const db = config.get('db');
     
-    mongoose.connect(dbUri, { replicaSet: 'rs' })
-        .then( () => console.log("We're in."))
+    mongoose.connect(db, { replicaSet: 'rs' })
+        .then( () => console.log(`We're in. Conected to ${db}`));
 }

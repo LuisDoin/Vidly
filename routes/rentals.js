@@ -1,3 +1,4 @@
+const validateObjectId = require('../middleware/validateObjectId');
 const asyncMiddleware = require('../middleware/async'); //used for pedagogic reasons.
 const admin = require("../middleware/admin");
 const auth = require('../middleware/auth');
@@ -70,7 +71,7 @@ router.post("/", auth,  async (req, res) => {
         
 });
     
-router.delete('/:id', [auth, admin], asyncMiddleware( async (req, res) => {
+router.delete('/:id', [auth, admin, validateObjectId], asyncMiddleware( async (req, res) => {
         
     const rental = await Rental.findByIdAndDelete(req.params.id);
     

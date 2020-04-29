@@ -6,7 +6,7 @@ describe("generateAuthToken", () =>{
 
     it("should return valid jwt with payload consisting of user's id and isAdmin properties.", () => {
         
-        const user = new User( {isAdmin: true });
+        const user = new User({isAdmin: true });
         
         const token = user.generateAuthToken();
 

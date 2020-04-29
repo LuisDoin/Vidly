@@ -19,10 +19,11 @@
     "winston-mongodb": "^5.0.1"
   },
   "devDependencies": {
-    "jest": "^25.4.0"
+    "jest": "^25.4.0",
+    "supertest": "^4.0.2"
   },
   "scripts": {
-    "test": "jest --watchAll"
+    "test": "jest --watchAll --verbose"
   },
   "author": "",
   "license": "ISC"

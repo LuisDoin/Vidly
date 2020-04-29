@@ -1,3 +1,4 @@
 {
-    "jwtPrivateKey": ""
+    "jwtPrivateKey": "",
+    "db": "mongodb://LAPTOP-LGQ90SB4:27017,LAPTOP-LGQ90SB4:27018,LAPTOP-LGQ90SB4:27019/vidly"
 }

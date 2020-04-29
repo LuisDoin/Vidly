@@ -1,3 +1,4 @@
+const validateObjectId = require('../middleware/validateObjectId');
 const asyncMiddleware = require('../middleware/async'); //used for pedagogic reasons.
 const admin = require("../middleware/admin");
 const auth = require('../middleware/auth');
@@ -11,7 +12,7 @@ router.get("/", asyncMiddleware( async (req, res) => {
 	res.send( await Movie.find() );
 }));
 
-router.get("/:id", asyncMiddleware( async (req, res) => {
+router.get("/:id", validateObjectId, asyncMiddleware( async (req, res) => {
 	
 	const movie = await Movie.findById(req.params.id);
 	
@@ -43,7 +44,7 @@ router.post("/", auth, asyncMiddleware( async (req, res) => {
 	
 }));
 
-router.put("/:id", auth, asyncMiddleware( async (req, res) => {
+router.put("/:id", [auth, validateObjectId], asyncMiddleware( async (req, res) => {
 	
 	const { error } = validate(req.body);
 	
@@ -69,7 +70,7 @@ router.put("/:id", auth, asyncMiddleware( async (req, res) => {
 	res.send( await movie.save() );
 }));
 
-router.delete("/:id", [auth, admin], asyncMiddleware( async (req, res) => {
+router.delete("/:id", [auth, admin, validateObjectId], asyncMiddleware( async (req, res) => {
 	
 	const movie = Movie.findByIdAndDelete(req.params.id);
 	
